@@ -37,7 +37,7 @@
       // included, separated by spaces.
       var SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-      const KEYWORD_COMBINATIONS = [
+      const PRODUCT_KEYWORDS = [
         {
             prefix: "",
             suffix: ""
@@ -77,33 +77,85 @@
           {
             prefix: "",
             suffix: " sale"
-          },
-          {
-            prefix: "www ",
-            suffix: " com"
-          },
-          {
-            prefix: "www",
-            suffix: "com"
-          },
-          {
-            prefix: "www ",
-            suffix: ""
-          },
-          {
-            prefix: "www",
-            suffix: ""
-          },
-          {
-            prefix: "",
-            suffix: " com"
-          },
-          {
-            prefix: "",
-            suffix: "com"
           }
-          
         ];
+
+        const SIMPLE_DOMAIN_KEYWORDS = [
+        {
+          prefix: "www ",
+          suffix: " com"
+        },
+        {
+          prefix: "www",
+          suffix: "com"
+        },
+        {
+          prefix: "www ",
+          suffix: ""
+        },
+        {
+          prefix: "www",
+          suffix: ""
+        },
+        {
+          prefix: "",
+          suffix: " com"
+        },
+        {
+          prefix: "",
+          suffix: "com"
+        }
+      ]
+
+      const COMPOUND_DOMAIN_KEYWORDS = [
+        {
+          prefix: "www ",
+          suffix: " com"
+        },
+        {
+          prefix: "www ",
+          suffix: ""
+        },
+        {
+          prefix: "",
+          suffix: " com"
+        },
+      ]
+
+      const NEGATIVE_KEYWORDS = [
+        {
+          keyword: "ingredient",
+          match_type: "Negative Broad"
+        },
+        {
+          keyword: "ingredients",
+          match_type: "Negative Broad"
+        },
+        {
+          keyword: "address",
+          match_type: "Negative Broad"
+        },
+        {
+          keyword: "location",
+          match_type: "Negative Broad"
+        },
+        {
+          keyword: "locations",
+          match_type: "Negative Broad"
+        },
+        {
+          keyword: "logo",
+          match_type: "Negative Broad"
+        },
+        {
+          keyword: "side effect",
+          match_type: "Negative Phrase"
+        },
+        {
+          keyword: "side effects",
+          match_type: "Negative Phrase"
+        },
+      ];
 
       var authorizeButton = document.getElementById('authorize_button');
       var signoutButton = document.getElementById('signout_button');
@@ -224,13 +276,63 @@
           }]
         }
 
-        for(combination in KEYWORD_COMBINATIONS) {
-          var keyword = KEYWORD_COMBINATIONS[combination].prefix + baseKeyword + KEYWORD_COMBINATIONS[combination].suffix;
-          var row = createRowData([campaign, adGroup, keyword, "phrase", finalUrl]);
+        //Product Keywords
+        for(keyword in PRODUCT_KEYWORDS) {
+          var keywordString = PRODUCT_KEYWORDS[keyword].prefix + baseKeyword + PRODUCT_KEYWORDS[keyword].suffix;
+          var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
+          spreadSheet.sheets[0].data[0].rowData.push(row);
+        }
+
+        //Domain Keywords
+        //check for simple domain
+        if (baseKeyword.indexOf(" ") < 0) {
+          for(keyword in SIMPLE_DOMAIN_KEYWORDS) {
+            var keywordString = SIMPLE_DOMAIN_KEYWORDS[keyword].prefix + baseKeyword + SIMPLE_DOMAIN_KEYWORDS[keyword].suffix;
+            var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
+            spreadSheet.sheets[0].data[0].rowData.push(row);
+          }
+        } else {
+          for(keyword in COMPOUND_DOMAIN_KEYWORDS) {
+            var keywordString = COMPOUND_DOMAIN_KEYWORDS[keyword].prefix + baseKeyword + COMPOUND_DOMAIN_KEYWORDS[keyword].suffix;
+            var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
+            spreadSheet.sheets[0].data[0].rowData.push(row);
+          }
+
+          //remove whitespace
+          baseKeyword.replace(/\s+/g, '');
+
+          for(keyword in SIMPLE_DOMAIN_KEYWORDS) {
+            var keywordString = SIMPLE_DOMAIN_KEYWORDS[keyword].prefix + baseKeyword + SIMPLE_DOMAIN_KEYWORDS[keyword].suffix;
+            var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
+            spreadSheet.sheets[0].data[0].rowData.push(row);
+          }
+        }
+
+        //Empty Brand Keywords
+        for (var i =0; i < 5; i++) {
+          var row = createRowData([campaign, adGroup, baseKeyword, "Phrase", finalUrl]);
+          spreadSheet.sheets[0].data[0].rowData.push(row);
+        }
+
+        //Negative Keywords
+
+        for (keyword in NEGATIVE_KEYWORDS) {
+          var row = createRowData([campaign, adGroup, NEGATIVE_KEYWORDS[keyword].keyword, NEGATIVE_KEYWORDS[keyword].match_type, ""])
           spreadSheet.sheets[0].data[0].rowData.push(row);
         }
         
         return spreadSheet;
+      }
+
+      function consoleLogSpreadSheet(spreadSheet) {
+        var rows = spreadSheet.sheets[0].data[0].rowData;
+        for (row in rows) {
+          var rowText = "";
+          for (value in rows[row].values) {
+            rowText+= rows[row].values[value].userEnteredValue.stringValue + " "
+          }
+          console.log(rowText)
+        }
       }
 
       function handleCreateClick(e) {
@@ -238,7 +340,7 @@
 
         var spreadSheet = createSpreadSheet(formData.campaign, formData.adGroup, formData.baseKeyword, formData.finalUrl);
 
-        console.log(spreadSheet);
+        consoleLogSpreadSheet(spreadSheet);
         //create spreadsheet
         gapi.client.sheets.spreadsheets.create(spreadSheet)
         .then((response => {
