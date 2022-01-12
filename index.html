@@ -299,17 +299,17 @@
           }
 
           //remove whitespace
-          baseKeyword.replace(/\s+/g, '');
+          var baseKeywordNoSpace = baseKeyword.replace(/\s+/g, '');
 
           for(keyword in SIMPLE_DOMAIN_KEYWORDS) {
-            var keywordString = SIMPLE_DOMAIN_KEYWORDS[keyword].prefix + baseKeyword + SIMPLE_DOMAIN_KEYWORDS[keyword].suffix;
+            var keywordString = SIMPLE_DOMAIN_KEYWORDS[keyword].prefix + baseKeywordNoSpace + SIMPLE_DOMAIN_KEYWORDS[keyword].suffix;
             var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
             spreadSheet.sheets[0].data[0].rowData.push(row);
           }
         }
 
         //Empty Brand Keywords
-        for (var i =0; i < 5; i++) {
+        for (var i =0; i < 20; i++) {
           var row = createRowData([campaign, adGroup, baseKeyword, "Phrase", finalUrl]);
           spreadSheet.sheets[0].data[0].rowData.push(row);
         }
@@ -318,6 +318,13 @@
 
         for (keyword in NEGATIVE_KEYWORDS) {
           var row = createRowData([campaign, adGroup, NEGATIVE_KEYWORDS[keyword].keyword, NEGATIVE_KEYWORDS[keyword].match_type, ""])
+          spreadSheet.sheets[0].data[0].rowData.push(row);
+        }
+
+        //Empty Negative Keywords
+
+        for (var i =0; i < 5; i++) {
+          var row = createRowData([campaign, adGroup, "", "Negative Broad", ""]);
           spreadSheet.sheets[0].data[0].rowData.push(row);
         }
         
