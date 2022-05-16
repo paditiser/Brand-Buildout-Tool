@@ -1,369 +1,52 @@
 <html>
   <head>
-    <script src="index.js"></script>
+    
   </head>
   <body>
-    <p>Google Sheets API Quickstart</p>
+    <h1>Aditiser Buildout Tool Suite Hub</h1>
 
+    <h4>Aditiser Account Login</h4>
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" style="display: none;">Authorize</button>
     <button id="signout_button" style="display: none;">Sign Out</button>
 
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
-
+    <h3>Brand Buildout Quickstart Template Tool</h3>
     <form id="buildout_data">
-      <label for="campaign_name">Campaign:</label><br>
-      <input type="text" id="campaign_name" name="campaign_name"><br>
-      <label for="ad_group_name">Ad Group:</label><br>
-      <input type="text" id="ad_group_name" name="ad_group_name"><br>
-      <label for="base_keyword_name">Base Keyword:</label><br>
-      <input type="text" id="base_keyword_name" name="base_keyword_name"><br>
-      <label for="final_url_name">Final URL:</label><br>
+      <label for="campaign_name">Campaign:</label>
+      <input type="text" id="campaign_name" name="campaign_name">
+      <label for="ad_group_name">Ad Group:</label>
+      <input type="text" id="ad_group_name" name="ad_group_name">
+      <label for="base_keyword_name">Base Keyword:</label>
+      <input type="text" id="base_keyword_name" name="base_keyword_name">
+      <label for="final_url_name">Final URL:</label>
       <input type="text" id="final_url_name" name="final_url_name">
     </form>
-    
-    <button id="create_button">Create Sheet</button>
+    <button id="create_brand_buildout_button">Create</button>
 
-    <script type="text/javascript">
-      // Client ID and API key from the Developer Console
-      var CLIENT_ID = '953951705449-hdci1bug82psf8vopsuucm3e7iq5m5id.apps.googleusercontent.com';
-      var API_KEY = 'AIzaSyCheFuLcUJw5XI5CJbd8j3gNQl9bA_Ypr8';
+    <h3>Master Brand Buildout Account Autogenerator</h3>
+    <label for="country">Select Country:</label>
 
-      // Array of API discovery doc URLs for APIs used by the quickstart
-      var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
-
-      // Authorization scopes required by the API; multiple scopes can be
-      // included, separated by spaces.
-      var SCOPES = "https://www.googleapis.com/auth/spreadsheets";
-
-      const PRODUCT_KEYWORDS = [
-        {
-            prefix: "",
-            suffix: ""
-          },
-          {
-            prefix: "",
-            suffix: " products"
-          },
-          {
-            prefix: "buy ",
-            suffix: ""
-          },
-          {
-            prefix: "buy ",
-            suffix: " online"
-          },
-          {
-            prefix: "cheap ",
-            suffix: ""
-          },
-          {
-            prefix: "",
-            suffix: " coupons"
-          },
-          {
-            prefix: "",
-            suffix: " discount"
-          },
-          {
-            prefix: "",
-            suffix: " online"
-          },
-          {
-            prefix: "",
-            suffix: " online store"
-          },
-          {
-            prefix: "",
-            suffix: " sale"
-          }
-        ];
-
-        const SIMPLE_DOMAIN_KEYWORDS = [
-        {
-          prefix: "www ",
-          suffix: " com"
-        },
-        {
-          prefix: "www",
-          suffix: "com"
-        },
-        {
-          prefix: "www ",
-          suffix: ""
-        },
-        {
-          prefix: "www",
-          suffix: ""
-        },
-        {
-          prefix: "",
-          suffix: " com"
-        },
-        {
-          prefix: "",
-          suffix: "com"
-        }
-      ]
-
-      const COMPOUND_DOMAIN_KEYWORDS = [
-        {
-          prefix: "www ",
-          suffix: " com"
-        },
-        {
-          prefix: "www ",
-          suffix: ""
-        },
-        {
-          prefix: "",
-          suffix: " com"
-        },
-      ]
-
-      const NEGATIVE_KEYWORDS = [
-        {
-          keyword: "ingredient",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "ingredients",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "address",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "location",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "locations",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "logo",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "side effect",
-          match_type: "Negative Phrase"
-        },
-        {
-          keyword: "side effects",
-          match_type: "Negative Phrase"
-        },
-        {
-          keyword: "review",
-          match_type: "Negative Broad"
-        },
-        {
-          keyword: "reviews",
-          match_type: "Negative Broad"
-        }
-      ];
-
-      var authorizeButton = document.getElementById('authorize_button');
-      var signoutButton = document.getElementById('signout_button');
-      var createButton = document.getElementById('create_button');
-
-      /**
-       *  On load, called to load the auth2 library and API client library.
-       */
-      function handleClientLoad() {
-        gapi.load('client:auth2', initClient);
-      }
-
-      /**
-       *  Initializes the API client library and sets up sign-in state
-       *  listeners.
-       */
-      function initClient() {
-        gapi.client.init({
-          apiKey: API_KEY,
-          clientId: CLIENT_ID,
-          discoveryDocs: DISCOVERY_DOCS,
-          scope: SCOPES
-        }).then(function () {
-          // Listen for sign-in state changes.
-          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-          // Handle the initial sign-in state.
-          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-          authorizeButton.onclick = handleAuthClick;
-          signoutButton.onclick = handleSignoutClick;
-          createButton.onclick = handleCreateClick;
-        }, function(error) {
-          appendPre(JSON.stringify(error, null, 2));
-        });
-      }
-
-      /**
-       *  Called when the signed in status changes, to update the UI
-       *  appropriately. After a sign-in, the API is called.
-       */
-      function updateSigninStatus(isSignedIn) {
-        if (isSignedIn) {
-          authorizeButton.style.display = 'none';
-          signoutButton.style.display = 'block';
-          
+    <select name="country" id="countries" multiple>
+      <option value="Canada" selected>Canada</option>
+      <option value="uk" disabled>United Kingdom</option>
+      <option value="ukraine" disabled>Ukraine</option>
+      <option value="russia" disabled>Russia</option>
+    </select>
+    <br/><br/>
+    <form id="brand_buildout_data">
+      <label for="master_brand_buildout_spreadsheet">Master Brand Buildout Spreadsheet:</label>
+      <input type="text" id="master_brand_buildout_spreadsheet" name="master_brand_buildout_spreadsheet">
+    </form>
+    <button id="create_brand_country_buildout_button">Create</button>
 
 
-        } else {
-          authorizeButton.style.display = 'block';
-          signoutButton.style.display = 'none';
-        }
-      }
-
-      /**
-       *  Sign in the user upon button click.
-       */
-      function handleAuthClick(event) {
-        gapi.auth2.getAuthInstance().signIn();
-      }
-
-      /**
-       *  Sign out the user upon button click.
-       */
-      function handleSignoutClick(event) {
-        gapi.auth2.getAuthInstance().signOut();
-      }
-
-      /**
-       * Append a pre element to the body containing the given message
-       * as its text node. Used to display the results of the API call.
-       *
-       * @param {string} message Text to be placed in pre element.
-       */
-      function appendPre(message) {
-        var pre = document.getElementById('content');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
-      }
-      
-      function readFormData() {
-        var formData = {};
-
-        formData.campaign = document.getElementById("campaign_name").value;
-        formData.adGroup = document.getElementById("ad_group_name").value;
-        formData.baseKeyword = document.getElementById("base_keyword_name").value;
-        formData.finalUrl = document.getElementById("final_url_name").value;
-
-        return formData;
-      }
-
-      //Takes an array of Row Data
-      function createRowData(values){
-        var rowData = {
-          values: []
-        }
-
-        for (value in values){
-          rowData.values.push({
-            userEnteredValue: {
-              stringValue: values[value]
-            } 
-          })
-        }
-
-        return rowData;
-      }
-
-      function createSpreadSheet(campaign, adGroup, baseKeyword, finalUrl){
-        var spreadSheet = {
-          properties: {
-            title: baseKeyword
-          },
-          sheets: [{
-            data: [{
-              //header row
-              rowData: [createRowData(["Campaign", "Ad Group", "Keyword", "Match Type", "Final URL"])]
-            }]
-          }]
-        }
-
-        //Product Keywords
-        for(keyword in PRODUCT_KEYWORDS) {
-          var keywordString = PRODUCT_KEYWORDS[keyword].prefix + baseKeyword + PRODUCT_KEYWORDS[keyword].suffix;
-          var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
-          spreadSheet.sheets[0].data[0].rowData.push(row);
-        }
-
-        //Domain Keywords
-        //check for simple domain
-        if (baseKeyword.indexOf(" ") < 0) {
-          for(keyword in SIMPLE_DOMAIN_KEYWORDS) {
-            var keywordString = SIMPLE_DOMAIN_KEYWORDS[keyword].prefix + baseKeyword + SIMPLE_DOMAIN_KEYWORDS[keyword].suffix;
-            var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
-            spreadSheet.sheets[0].data[0].rowData.push(row);
-          }
-        } else {
-          for(keyword in COMPOUND_DOMAIN_KEYWORDS) {
-            var keywordString = COMPOUND_DOMAIN_KEYWORDS[keyword].prefix + baseKeyword + COMPOUND_DOMAIN_KEYWORDS[keyword].suffix;
-            var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
-            spreadSheet.sheets[0].data[0].rowData.push(row);
-          }
-
-          //remove whitespace
-          var baseKeywordNoSpace = baseKeyword.replace(/\s+/g, '');
-
-          for(keyword in SIMPLE_DOMAIN_KEYWORDS) {
-            var keywordString = SIMPLE_DOMAIN_KEYWORDS[keyword].prefix + baseKeywordNoSpace + SIMPLE_DOMAIN_KEYWORDS[keyword].suffix;
-            var row = createRowData([campaign, adGroup, keywordString, "Phrase", finalUrl]);
-            spreadSheet.sheets[0].data[0].rowData.push(row);
-          }
-        }
-
-        //Empty Brand Keywords
-        for (var i =0; i < 20; i++) {
-          var row = createRowData([campaign, adGroup, baseKeyword, "Phrase", finalUrl]);
-          spreadSheet.sheets[0].data[0].rowData.push(row);
-        }
-
-        //Negative Keywords
-
-        for (keyword in NEGATIVE_KEYWORDS) {
-          var row = createRowData([campaign, adGroup, NEGATIVE_KEYWORDS[keyword].keyword, NEGATIVE_KEYWORDS[keyword].match_type, ""])
-          spreadSheet.sheets[0].data[0].rowData.push(row);
-        }
-
-        //Empty Negative Keywords
-
-        for (var i =0; i < 5; i++) {
-          var row = createRowData([campaign, adGroup, "", "Negative Broad", ""]);
-          spreadSheet.sheets[0].data[0].rowData.push(row);
-        }
-        
-        return spreadSheet;
-      }
-
-      function consoleLogSpreadSheet(spreadSheet) {
-        var rows = spreadSheet.sheets[0].data[0].rowData;
-        for (row in rows) {
-          var rowText = "";
-          for (value in rows[row].values) {
-            rowText+= rows[row].values[value].userEnteredValue.stringValue + " "
-          }
-          console.log(rowText)
-        }
-      }
-
-      function handleCreateClick(e) {
-        var formData = readFormData();
-
-        var spreadSheet = createSpreadSheet(formData.campaign, formData.adGroup, formData.baseKeyword, formData.finalUrl);
-
-        consoleLogSpreadSheet(spreadSheet);
-        //create spreadsheet
-        gapi.client.sheets.spreadsheets.create(spreadSheet)
-        .then((response => {
-          window.open(response.result.spreadsheetUrl, '_blank');
-        }));
-      }
-
-    </script>
+    <!--Stylesheet-->
+    <link rel="stylesheet" href="index.css">
+    <!--Scripts-->
+    <script src="constants.js"></script>
+    <script src="index.js"></script>
 
     <script async defer src="https://apis.google.com/js/api.js"
       onload="this.onload=function(){};handleClientLoad()"
