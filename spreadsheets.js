@@ -327,6 +327,8 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
             "", // flexible reach
           ];
           const adRow = createRowData(adRowValues);
+          handleFieldLengthLimits(adRow);
+        
           masterSpreadsheet.sheets[0].data[0].rowData.push(adRow);
         }
 
@@ -350,8 +352,8 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
 
 function createHeadline1(brandTitle, headline1) {
   const index = headline1.indexOf('Brand');
-  const newString = headline1.substr(0, index) + brandTitle + headline1.substr(index + 1);
-  
+  const newString = headline1.substr(0, index) + brandTitle + headline1.substr(index + 5);
+  console.log(newString)
   return newString;
 }
 
@@ -374,7 +376,6 @@ function createPath(brandTitle) {
   }
   if(path.length > 15) {
     console.log("ERROR: PATH OVER 15 CHARACHTERS PLEASE CHECK")
-    path = "";
   }
 
   return path;
@@ -520,19 +521,46 @@ function copyRowData(row) {
 }
 //Takes an array of Row Data
 function createRowData(values){
-var rowData = {
-  values: []
-} 
+  var rowData = {
+    values: []
+  } 
 
-for (value in values){
-  rowData.values.push({
-    userEnteredValue: {
-      stringValue: values[value]
-    } 
-  })
+  for (value in values){
+    rowData.values.push({
+      userEnteredValue: {
+        stringValue: values[value]
+      },
+      userEnteredFormat: {
+        backgroundColor: {
+          red: 1,
+          green: 1,
+          blue: 1
+        }
+      } 
+    })
+  }
+
+  return rowData;
 }
 
-return rowData;
+function handleFieldLengthLimits(rowData) {
+  //10 and 13
+  const headline1 = rowData.values[10].userEnteredValue.stringValue;
+  if(headline1.length > 30) {
+    markCellRed(rowData.values[10])
+  }
+
+  const path1 = rowData.values[13].userEnteredValue.stringValue;
+  if(path1.length > 15) {
+    markCellRed(rowData.values[13])
+  }
+  
+}
+
+//objects are passed by reference
+function markCellRed(cell) {
+  cell.userEnteredFormat.backgroundColor.green = 0;
+  cell.userEnteredFormat.backgroundColor.blue = 0;
 }
 
 async function createNewDocument(spreadsheet) {
