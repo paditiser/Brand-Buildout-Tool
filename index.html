@@ -13,7 +13,7 @@
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
     <h3>Brand Buildout Quickstart Template Tool</h3>
-    <form id="buildout_data">
+    <form id="brand_buildout_template_data">
       <label for="campaign_name">Campaign:</label>
       <input type="text" id="campaign_name" name="campaign_name">
       <label for="ad_group_name">Ad Group:</label>
@@ -23,29 +23,22 @@
       <label for="final_url_name">Final URL:</label>
       <input type="text" id="final_url_name" name="final_url_name">
     </form>
-    <button id="create_brand_buildout_button">Create</button>
+    <button id="create_brand_buildout_template_button">Create</button>
 
     <h3>Master Brand Buildout Account Autogenerator</h3>
-    <label for="country">Select Country:</label>
-
-    <select name="country" id="countries" multiple>
-      <option value="Canada" selected>Canada</option>
-      <option value="uk" disabled>United Kingdom</option>
-      <option value="ukraine" disabled>Ukraine</option>
-      <option value="russia" disabled>Russia</option>
-    </select>
-    <br/><br/>
-    <form id="brand_buildout_data">
-      <label for="master_brand_buildout_spreadsheet">Master Brand Buildout Spreadsheet:</label>
-      <input type="text" id="master_brand_buildout_spreadsheet" name="master_brand_buildout_spreadsheet">
+    <form id="account_buildout_data">
+      <label for="master_brand_buildout_spreadsheet">Master Brand Buildout Spreadsheet URL:</label>
+      <input type="text" id="master_brand_buildout_spreadsheet" name="master_brand_buildout_spreadsheet" value="https://docs.google.com/spreadsheets/d/1JWkGF7YqdvE4KhlV4unr0OwsUuK3Qf955vAqJ0O4cak/edit#gid=395315869">
+      <label for="account_data_spreadsheet">Account Data Spreadsheet URL:</label>
+      <input type="text" id="account_data_spreadsheet" name="account_data_spreadsheet" value="https://docs.google.com/spreadsheets/d/1dCx3OIkVv6Mdt9xEuOnJwr26UHy9lFqzZgkgq4PA3mM/edit#gid=1300538137">
     </form>
-    <button id="create_brand_country_buildout_button">Create</button>
-
+    <button id="create_account_buildout_button">Create</button>
 
     <!--Stylesheet-->
     <link rel="stylesheet" href="index.css">
     <!--Scripts-->
     <script src="constants.js"></script>
+    <script src="spreadsheets.js"></script>
     <script src="index.js"></script>
 
     <script defer src="https://apis.google.com/js/api.js"
