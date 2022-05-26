@@ -148,6 +148,7 @@ async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet) {
 
   const accounts = getAccountsURLDataFromSheet(urlDataSheet);
   let spreadsheets = [];
+  console.log(accounts)
 
   for(let i = 0; i < accounts.length; i++) {
     const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, accounts[i]);
@@ -173,7 +174,7 @@ function getAccountsURLDataFromSheet(sheet) {
     const thirdLevelDomain = row.values[3].userEnteredValue.stringValue;
 
     const accountData = { accountTitle, thirdLevelDomain }
-
+    console.log(accountTitle)
     // sorry
     let included = false;
     for (let i = 0; i < accounts.length; i++) {
@@ -546,7 +547,7 @@ function createRowData(values){
 function handleFieldLengthLimits(rowData) {
   //10 and 13
   const headline1 = rowData.values[10].userEnteredValue.stringValue;
-  if(headline1.length > 30) {
+  if(headline1.length > 40) {
     markCellRed(rowData.values[10])
   }
 
