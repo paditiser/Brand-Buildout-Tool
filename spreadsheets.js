@@ -169,7 +169,7 @@ function getAccountsURLDataFromSheet(sheet) {
   //skip header
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
-
+    if(rowIsEmpty(row)) continue;
     const accountTitle = row.values[0].userEnteredValue.stringValue;
     const thirdLevelDomain = row.values[3].userEnteredValue.stringValue;
 
