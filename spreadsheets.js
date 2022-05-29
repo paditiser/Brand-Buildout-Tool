@@ -301,29 +301,47 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
         const adCopyRowData = getAdCopyRowData(adCopySheet, account.accountTitle, language, campaign);
         const brandTitle = adGroupTitle.slice(8);
         const path = createPath(brandTitle);
-
+        console.log(adCopyRowData)
         for(let i = 0; i < adCopyRowData.length; i++) {
+          const campaign = campaignTitle;
+          const adGroup = adGroupTitle;
+          //final URL
+          const labels = !isCellEmpty(adCopyRowData[i].values[4]) ? adCopyRowData[i].values[4].userEnteredValue.stringValue : "";
+          const adType = !isCellEmpty(adCopyRowData[i].values[5]) ? adCopyRowData[i].values[5].userEnteredValue.stringValue : "";
+          const status = !isCellEmpty(adCopyRowData[i].values[6]) ? adCopyRowData[i].values[6].userEnteredValue.stringValue : "";
+          const descriptionLine1 = !isCellEmpty(adCopyRowData[i].values[7]) ? adCopyRowData[i].values[7].userEnteredValue.stringValue : "";
+          const descriptionLine2 = !isCellEmpty(adCopyRowData[i].values[8]) ? adCopyRowData[i].values[8].userEnteredValue.stringValue : "";
+          const headline1 =!isCellEmpty(adCopyRowData[i].values[9]) ? createHeadline1(brandTitle, adCopyRowData[i].values[9].userEnteredValue.stringValue) : "";
+          const headline2 =!isCellEmpty(adCopyRowData[i].values[10]) ? adCopyRowData[i].values[10].userEnteredValue.stringValue : "";
+          const headline3 = !isCellEmpty(adCopyRowData[i].values[11]) ? adCopyRowData[i].values[11].userEnteredValue.stringValue : "";
+          // path
+          const headline4 = !isCellEmpty(adCopyRowData[i].values[12]) ? adCopyRowData[i].values[12].userEnteredValue.stringValue : "";
+          const headline5 = !isCellEmpty(adCopyRowData[i].values[13]) ? adCopyRowData[i].values[13].userEnteredValue.stringValue : "";
+          const description1 = !isCellEmpty(adCopyRowData[i].values[14]) ? adCopyRowData[i].values[14].userEnteredValue.stringValue : "";
+          const description1Position =!isCellEmpty(adCopyRowData[i].values[15]) ? adCopyRowData[i].values[15].userEnteredValue.stringValue : "";
+          const description2 =!isCellEmpty(adCopyRowData[i].values[16]) ? adCopyRowData[i].values[16].userEnteredValue.stringValue : "";
+          const description3 =!isCellEmpty(adCopyRowData[i].values[17]) ? adCopyRowData[i].values[17].userEnteredValue.stringValue : "";
           const adRowValues = [
-            campaignTitle, 
-            adGroupTitle, 
-            "", 
-            "", 
+            campaign, 
+            adGroup, 
+            "", //keyword
+            "", //critereon
             finalURL,
-            !isCellEmpty(adCopyRowData[i].values[4]) ? adCopyRowData[i].values[4].userEnteredValue.stringValue : "", // labels
-            !isCellEmpty(adCopyRowData[i].values[5]) ? adCopyRowData[i].values[5].userEnteredValue.stringValue : "", // ad type
-            !isCellEmpty(adCopyRowData[i].values[6]) ? adCopyRowData[i].values[6].userEnteredValue.stringValue : "", // status
-            !isCellEmpty(adCopyRowData[i].values[7]) ? adCopyRowData[i].values[7].userEnteredValue.stringValue : "", // description line 1
-            !isCellEmpty(adCopyRowData[i].values[8]) ? adCopyRowData[i].values[8].userEnteredValue.stringValue : "", // description line 2
-            !isCellEmpty(adCopyRowData[i].values[9]) ? createHeadline1(brandTitle, adCopyRowData[i].values[9].userEnteredValue.stringValue) : "", // headline 1 TODO
-            !isCellEmpty(adCopyRowData[i].values[10]) ? adCopyRowData[i].values[10].userEnteredValue.stringValue : "", // headline 2
-            !isCellEmpty(adCopyRowData[i].values[11]) ? adCopyRowData[i].values[11].userEnteredValue.stringValue : "", // headline 3
+            labels, // labels
+            adType, // ad type
+            status, // status
+            descriptionLine1, // description line 1
+            descriptionLine2, // description line 2
+            headline1, // headline 1 TODO
+            headline2, // headline 2
+            headline3, // headline 3
             path, 
-            !isCellEmpty(adCopyRowData[i].values[12]) ? adCopyRowData[i].values[12].userEnteredValue.stringValue : "", // headline 4
-            !isCellEmpty(adCopyRowData[i].values[13]) ? adCopyRowData[i].values[13].userEnteredValue.stringValue : "", // headline 5
-            !isCellEmpty(adCopyRowData[i].values[14]) ? adCopyRowData[i].values[14].userEnteredValue.stringValue : "", // description 1
-            !isCellEmpty(adCopyRowData[i].values[15]) ? adCopyRowData[i].values[15].userEnteredValue.stringValue : "", // description 1 position
-            !isCellEmpty(adCopyRowData[i].values[16]) ? adCopyRowData[i].values[16].userEnteredValue.stringValue : "", // description 2
-            !isCellEmpty(adCopyRowData[i].values[17]) ? adCopyRowData[i].values[17].userEnteredValue.stringValue : "", // description 3
+            headline4, // headline 4
+            headline5, // headline 5
+            description1, // description 1
+            description1Position, // description 1 position
+            description2, // description 2
+            description3, // description 3
             "", // max cpc
             "", // flexible reach
           ];
@@ -383,7 +401,8 @@ function createPath(brandTitle) {
 }
 
 function isCellEmpty(cell) {
-  return !cell.hasOwnProperty('userEnteredValue')
+  console.log(cell)
+  return typeof cell === "undefined" || !cell.hasOwnProperty('userEnteredValue')
 }
 
 /**potentially hazasrdous */
