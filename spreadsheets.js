@@ -354,14 +354,16 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
         //Keywords  
         // add country specific keyword postfix
         for(let i = 0; i < keywordRowData.length; i++) { 
-          if (keywordRowData[i].values.length > 4 && keywordRowData[i].values[4].hasOwnProperty('userEnteredValue')) {
+          if (!isCellEmpty(keywordRowData[i].values[4])) {
             const rawFinalURL = keywordRowData[i].values[4].userEnteredValue.stringValue;
-            const postfix = getPostfixFromSheet(urlDataSheet, account, language);
-            const accountFinalURL = rawFinalURL + (rawFinalURL.indexOf('?') >= 0 ? "&" + postfix : "?" + postfix);
-            keywordRowData[i].values[4].userEnteredValue.stringValue = accountFinalURL;
- 
-            masterSpreadsheet.sheets[0].data[0].rowData.push(keywordRowData[i]);
-          }
+            
+            const rawPostfix = getPostfixFromSheet(urlDataSheet, account, language);
+            const postfix = (rawFinalURL.indexOf('?') >= 0 ? "&" + rawPostfix : "?" + rawPostfix);
+            const accountFinalURL = rawFinalURL.length < 5 ? " " : rawFinalURL + postfix;
+            keywordRowData[i].values[4].userEnteredValue.stringValue = accountFinalURL; 
+          } 
+
+          masterSpreadsheet.sheets[0].data[0].rowData.push(keywordRowData[i]);
         }
       }
     }
