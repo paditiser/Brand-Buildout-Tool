@@ -299,7 +299,7 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
         //Ads
         //TODO
         const adCopyRowData = getAdCopyRowData(adCopySheet, account.accountTitle, language, campaign);
-        const brandTitle = adGroupTitle.slice(8);
+        const brandTitle = sheet.properties.title;
         const path = createPath(brandTitle);
         console.log(adCopyRowData)
         for(let i = 0; i < adCopyRowData.length; i++) {
@@ -401,7 +401,6 @@ function createPath(brandTitle) {
 }
 
 function isCellEmpty(cell) {
-  console.log(cell)
   return typeof cell === "undefined" || !cell.hasOwnProperty('userEnteredValue')
 }
 
