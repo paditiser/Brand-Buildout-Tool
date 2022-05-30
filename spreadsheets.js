@@ -197,7 +197,7 @@ function getAccountCampaignsFromSheet(sheet, account) {
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
     if(rowIsEmpty(row)){
-      break;
+      continue;
     }
     const campaign = row.values[3].userEnteredValue.stringValue;
     const rowAccount = row.values[1].userEnteredValue.stringValue;
@@ -216,7 +216,7 @@ function getAccountLanguagesFromSheet(sheet, account) {
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
     if(rowIsEmpty(row)){
-      break;
+      continue;
     }
     const language = row.values[2].userEnteredValue.stringValue;
     const rowAccount = row.values[1].userEnteredValue.stringValue;
@@ -234,7 +234,7 @@ function getPostfixFromSheet(sheet, account, language) {
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
     if(rowIsEmpty(row)){
-      break;
+      continue;
     } 
     const rowLanguage = row.values[1].userEnteredValue.stringValue;
     const rowAccount = row.values[0].userEnteredValue.stringValue;
