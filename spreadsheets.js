@@ -273,7 +273,7 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
           let newRowData = copyRowData(rowData[i])
           const rawCampaignTitle = newRowData.values[0].userEnteredValue.stringValue;
           
-          const accountCampaignTitle = languages.length < 2 ? (rawCampaignTitle + " > " + account.accountTitle + " > " + campaign) : (rawCampaignTitle + " > " + account.accountTitle + " > " + campaign + " (" + language + ")");
+          const accountCampaignTitle = (rawCampaignTitle + " > " + account.accountTitle + " > " + campaign + " (" + language + ")");
           newRowData.values[0].userEnteredValue.stringValue = accountCampaignTitle;
           keywordRowData.push(newRowData);
         }
