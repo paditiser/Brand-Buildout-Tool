@@ -148,9 +148,8 @@ async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet) {
 
   const accounts = getAccountsURLDataFromSheet(urlDataSheet);
   let spreadsheets = [];
-  console.log(accounts)
-
   for(let i = 0; i < accounts.length; i++) {
+    console.log(accounts[i].accountTitle)
     const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, accounts[i]);
     spreadsheets.push(accountBuildoutSpreadsheet);
   }
@@ -249,7 +248,7 @@ function getPostfixFromSheet(sheet, account, language) {
 }
 
 async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, account) {
-  const rawHeaderRow = ["Campaign", "Ad Group", "Keyword", "Criterion Type", "Final URL", "Labels", "Ad type", "Status", "Description Line 1", "Description Line 2", "Headline 1", "Headline 2", "Headline 3", "Path 1", "Headline 4", "Headline 5", "Description 1", "Description 1 position", "Description 2", "Description 3", "Max CPC", "Flexible Reach"];
+  const rawHeaderRow = ["Campaign", "Ad Group", "Keyword", "Criterion Type", "Final URL", "Labels", "Ad type", "Status", "Description Line 1", "Description Line 2", "Headline 1", "Headline 2", "Headline 3", "Path 1", "Headline 4", "Headline 5", "Headline 6", "Headline 7", "Description 1", "Description 1 position", "Description 2", "Description 3", "Max CPC", "Flexible Reach"];
   //adds header row 
   let masterSpreadsheet = createSpreadSheet(account.accountTitle + " Buildout", rawHeaderRow);
   const languages = getAccountLanguagesFromSheet(adCopySheet, account);
@@ -317,10 +316,22 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
           // path
           const headline4 = !isCellEmpty(adCopyRowData[i].values[12]) ? adCopyRowData[i].values[12].userEnteredValue.stringValue : "";
           const headline5 = !isCellEmpty(adCopyRowData[i].values[13]) ? adCopyRowData[i].values[13].userEnteredValue.stringValue : "";
-          const description1 = !isCellEmpty(adCopyRowData[i].values[14]) ? adCopyRowData[i].values[14].userEnteredValue.stringValue : "";
-          const description1Position =!isCellEmpty(adCopyRowData[i].values[15]) ? adCopyRowData[i].values[15].userEnteredValue.stringValue : "";
-          const description2 =!isCellEmpty(adCopyRowData[i].values[16]) ? adCopyRowData[i].values[16].userEnteredValue.stringValue : "";
-          const description3 =!isCellEmpty(adCopyRowData[i].values[17]) ? adCopyRowData[i].values[17].userEnteredValue.stringValue : "";
+          const headline6 = !isCellEmpty(adCopyRowData[i].values[14]) ? adCopyRowData[i].values[14].userEnteredValue.stringValue : "";
+          const headline7 = !isCellEmpty(adCopyRowData[i].values[15]) ? adCopyRowData[i].values[15].userEnteredValue.stringValue : "";
+          const description1 = !isCellEmpty(adCopyRowData[i].values[16]) ? adCopyRowData[i].values[16].userEnteredValue.stringValue : "";
+          let description1Position = null;
+          if(!isCellEmpty(adCopyRowData[i].values[17])) {
+            description1Position = adCopyRowData[i].values[17].userEnteredValue.stringValue;
+            
+            if(typeof description1Position === "undefined") {
+              description1Position = adCopyRowData[i].values[17].userEnteredValue.numberValue;
+              console.log(description1Position)
+            }
+          } else {
+            description1Position = "";
+          }
+          const description2 =!isCellEmpty(adCopyRowData[i].values[18]) ? adCopyRowData[i].values[18].userEnteredValue.stringValue : "";
+          const description3 =!isCellEmpty(adCopyRowData[i].values[19]) ? adCopyRowData[i].values[19].userEnteredValue.stringValue : "";
           const adRowValues = [
             campaign, 
             adGroup, 
@@ -338,6 +349,8 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
             path, 
             headline4, // headline 4
             headline5, // headline 5
+            headline6, // headline 6
+            headline7, // headline 7
             description1, // description 1
             description1Position, // description 1 position
             description2, // description 2
@@ -374,7 +387,6 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
 function createHeadline1(brandTitle, headline1) {
   const index = headline1.indexOf('Brand');
   const newString = headline1.substr(0, index) + brandTitle + headline1.substr(index + 5);
-  console.log(newString)
   return newString;
 }
 
@@ -409,7 +421,7 @@ function isCellEmpty(cell) {
 /**potentially hazasrdous */
 function createAdGroupRowData(campaign, adGroup, campaignStatus, adGroupStatus, campaignType) {
   const flexibleReach = campaignType === "Acquisition" ? "Audience segments;Genders;Ages;Parental status;Household incomes" : "Genders;Ages;Parental status;Household incomes";
-  return createRowData([campaign, adGroup, "", "", "" , "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "0.5", flexibleReach])
+  return createRowData([campaign, adGroup, "", "", "" , "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "0.5", flexibleReach])
 }
 
 function indexIncluded (indexes, index) {
@@ -545,20 +557,35 @@ function createRowData(values){
   var rowData = {
     values: []
   } 
-
   for (value in values){
-    rowData.values.push({
-      userEnteredValue: {
-        stringValue: values[value]
-      },
-      userEnteredFormat: {
-        backgroundColor: {
-          red: 1,
-          green: 1,
-          blue: 1
-        }
-      } 
-    })
+    if(typeof values[value] === "string") {
+      rowData.values.push({
+        userEnteredValue: {
+          stringValue: values[value]
+        },
+        userEnteredFormat: {
+          backgroundColor: {
+            red: 1,
+            green: 1,
+            blue: 1
+          }
+        } 
+      })
+    } else if(typeof values[value] === "number") {
+      rowData.values.push({
+        userEnteredValue: {
+          numberValue: values[value]
+        },
+        userEnteredFormat: {
+          backgroundColor: {
+            red: 1,
+            green: 1,
+            blue: 1
+          }
+        } 
+      })
+    }
+    
   }
 
   return rowData;
