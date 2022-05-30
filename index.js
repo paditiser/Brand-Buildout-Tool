@@ -93,6 +93,9 @@ function handleCreateBrandTemplateBuildoutClick(e) {
  * Create Account buildouts on Click 
  */
 async function handleCreateAccountBuildoutClick(e) {
+  document.getElementById("create_account_buildout_button").hidden = true;
+  document.getElementById("create_account_buildout_loader").hidden = false;
+
   const formData = readAccountBuildoutData();
   
   if(formData.accountDataSpreadsheetURL === "" || formData.brandBuildoutSpreadsheetURL === ""){
@@ -104,7 +107,9 @@ async function handleCreateAccountBuildoutClick(e) {
   console.log("first", brandBuildoutSpreadsheet)
   const accountDataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
   
-  processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheet);
+  await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheet);
+  document.getElementById("create_account_buildout_loader").hidden = true;
+  document.getElementById("create_account_buildout_button").hidden = false;
 }
 
 function readBrandBuildoutTemplateData() {
