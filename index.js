@@ -6,6 +6,27 @@ const signoutButton = document.getElementById('signout_button');
 const createBrandBuildoutTemplateButton = document.getElementById('create_brand_buildout_template_button');
 const createAccountBuildoutButton = document.getElementById('create_account_buildout_button');
 
+
+      
+
+
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+            }
+        }
+    }
+    rawFile.send(null);
+    return rawFile.responseText;
+}
 /**
  *  On load, called to load the auth2 library and API client library.
  */
@@ -35,6 +56,10 @@ function initClient() {
     signoutButton.onclick = handleSignoutClick;
     createBrandBuildoutTemplateButton.onclick = handleCreateBrandTemplateBuildoutClick;
     createAccountBuildoutButton.onclick = handleCreateAccountBuildoutClick;
+
+    // Initiate patch notes
+    const patchNotes = readTextFile("patchnotes.txt")
+    document.getElementById('patch_notes').innerText=patchNotes;    
     
   }, function(error) {
     appendPre(JSON.stringify(error, null, 2));
@@ -93,8 +118,8 @@ function handleCreateBrandTemplateBuildoutClick(e) {
  * Create Account buildouts on Click 
  */
 async function handleCreateAccountBuildoutClick(e) {
-  document.getElementById("create_account_buildout_button").hidden = true;
-  document.getElementById("create_account_buildout_loader").hidden = false;
+  document.getElementById("buildout_button_default").hidden = true;
+  document.getElementById("buildout_button_loading").hidden = false;
 
   const formData = readAccountBuildoutData();
   
@@ -108,8 +133,8 @@ async function handleCreateAccountBuildoutClick(e) {
   const accountDataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
   
   await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheet);
-  document.getElementById("create_account_buildout_loader").hidden = true;
-  document.getElementById("create_account_buildout_button").hidden = false;
+  document.getElementById("buildout_button_loading").hidden = true;
+  document.getElementById("buildout_button_default").hidden = false;
 }
 
 function readBrandBuildoutTemplateData() {

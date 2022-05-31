@@ -248,7 +248,7 @@ function getPostfixFromSheet(sheet, account, language) {
 }
 
 async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, account) {
-  const rawHeaderRow = ["Campaign", "Ad Group", "Keyword", "Criterion Type", "Final URL", "Labels", "Ad type", "Status", "Description Line 1", "Description Line 2", "Headline 1", "Headline 2", "Headline 3", "Path 1", "Headline 4", "Headline 5", "Headline 6", "Headline 7", "Description 1", "Description 1 position", "Description 2", "Description 3", "Max CPC", "Flexible Reach"];
+  const rawHeaderRow = ["Campaign", "Ad Group", "Keyword", "Criterion Type", "Final URL", "Labels", "Ad type", "Status", "Description Line 1", "Description Line 2", "Headline 1", "Headline 1 position", "Headline 2", "Headline 3", "Path 1", "Headline 4", "Headline 5", "Headline 6", "Headline 7", "Description 1", "Description 1 position", "Description 2", "Description 3", "Description 4", "Max CPC", "Flexible Reach"];
   //adds header row 
   let masterSpreadsheet = createSpreadSheet(account.accountTitle + " Buildout", rawHeaderRow);
   const languages = getAccountLanguagesFromSheet(adCopySheet, account);
@@ -310,28 +310,38 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
           const status = !isCellEmpty(adCopyRowData[i].values[6]) ? adCopyRowData[i].values[6].userEnteredValue.stringValue : "";
           const descriptionLine1 = !isCellEmpty(adCopyRowData[i].values[7]) ? adCopyRowData[i].values[7].userEnteredValue.stringValue : "";
           const descriptionLine2 = !isCellEmpty(adCopyRowData[i].values[8]) ? adCopyRowData[i].values[8].userEnteredValue.stringValue : "";
-          const headline1 =!isCellEmpty(adCopyRowData[i].values[9]) ? createHeadline1(brandTitle, adCopyRowData[i].values[9].userEnteredValue.stringValue) : "";
-          const headline2 =!isCellEmpty(adCopyRowData[i].values[10]) ? adCopyRowData[i].values[10].userEnteredValue.stringValue : "";
-          const headline3 = !isCellEmpty(adCopyRowData[i].values[11]) ? adCopyRowData[i].values[11].userEnteredValue.stringValue : "";
+          const headline1 = !isCellEmpty(adCopyRowData[i].values[9]) ? createHeadline1(brandTitle, adCopyRowData[i].values[9].userEnteredValue.stringValue) : "";
+          let headline1Position;
+          if(!isCellEmpty(adCopyRowData[i].values[10])) {
+            headline1Position = adCopyRowData[i].values[10].userEnteredValue.stringValue;
+            
+            if(typeof headline1Position === "undefined") {
+              headline1Position = adCopyRowData[i].values[10].userEnteredValue.numberValue;
+            }
+          } else {
+            headline1Position = "";
+          }
+          const headline2 = !isCellEmpty(adCopyRowData[i].values[11]) ? adCopyRowData[i].values[11].userEnteredValue.stringValue : "";
+          const headline3 = !isCellEmpty(adCopyRowData[i].values[12]) ? adCopyRowData[i].values[12].userEnteredValue.stringValue : "";
           // path
-          const headline4 = !isCellEmpty(adCopyRowData[i].values[12]) ? adCopyRowData[i].values[12].userEnteredValue.stringValue : "";
-          const headline5 = !isCellEmpty(adCopyRowData[i].values[13]) ? adCopyRowData[i].values[13].userEnteredValue.stringValue : "";
-          const headline6 = !isCellEmpty(adCopyRowData[i].values[14]) ? adCopyRowData[i].values[14].userEnteredValue.stringValue : "";
-          const headline7 = !isCellEmpty(adCopyRowData[i].values[15]) ? adCopyRowData[i].values[15].userEnteredValue.stringValue : "";
-          const description1 = !isCellEmpty(adCopyRowData[i].values[16]) ? adCopyRowData[i].values[16].userEnteredValue.stringValue : "";
-          let description1Position = null;
-          if(!isCellEmpty(adCopyRowData[i].values[17])) {
-            description1Position = adCopyRowData[i].values[17].userEnteredValue.stringValue;
+          const headline4 = !isCellEmpty(adCopyRowData[i].values[13]) ? adCopyRowData[i].values[13].userEnteredValue.stringValue : "";
+          const headline5 = !isCellEmpty(adCopyRowData[i].values[14]) ? adCopyRowData[i].values[14].userEnteredValue.stringValue : "";
+          const headline6 = !isCellEmpty(adCopyRowData[i].values[15]) ? adCopyRowData[i].values[15].userEnteredValue.stringValue : "";
+          const headline7 = !isCellEmpty(adCopyRowData[i].values[16]) ? adCopyRowData[i].values[16].userEnteredValue.stringValue : "";
+          const description1 = !isCellEmpty(adCopyRowData[i].values[17]) ? adCopyRowData[i].values[17].userEnteredValue.stringValue : "";
+          let description1Position;
+          if(!isCellEmpty(adCopyRowData[i].values[18])) {
+            description1Position = adCopyRowData[i].values[18].userEnteredValue.stringValue;
             
             if(typeof description1Position === "undefined") {
-              description1Position = adCopyRowData[i].values[17].userEnteredValue.numberValue;
-              console.log(description1Position)
+              description1Position = adCopyRowData[i].values[18].userEnteredValue.numberValue;
             }
           } else {
             description1Position = "";
           }
-          const description2 =!isCellEmpty(adCopyRowData[i].values[18]) ? adCopyRowData[i].values[18].userEnteredValue.stringValue : "";
-          const description3 =!isCellEmpty(adCopyRowData[i].values[19]) ? adCopyRowData[i].values[19].userEnteredValue.stringValue : "";
+          const description2 = !isCellEmpty(adCopyRowData[i].values[19]) ? adCopyRowData[i].values[19].userEnteredValue.stringValue : "";
+          const description3 = !isCellEmpty(adCopyRowData[i].values[20]) ? adCopyRowData[i].values[20].userEnteredValue.stringValue : "";
+          const description4 = !isCellEmpty(adCopyRowData[i].values[21]) ? adCopyRowData[i].values[21].userEnteredValue.stringValue : "";
           const adRowValues = [
             campaign, 
             adGroup, 
@@ -344,6 +354,7 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
             descriptionLine1, // description line 1
             descriptionLine2, // description line 2
             headline1, // headline 1 TODO
+            headline1Position,
             headline2, // headline 2
             headline3, // headline 3
             path, 
@@ -355,6 +366,7 @@ async function createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet
             description1Position, // description 1 position
             description2, // description 2
             description3, // description 3
+            description4,
             "", // max cpc
             "", // flexible reach
           ];
@@ -421,7 +433,7 @@ function isCellEmpty(cell) {
 /**potentially hazasrdous */
 function createAdGroupRowData(campaign, adGroup, campaignStatus, adGroupStatus, campaignType) {
   const flexibleReach = campaignType === "Acquisition" ? "Audience segments;Genders;Ages;Parental status;Household incomes" : "Genders;Ages;Parental status;Household incomes";
-  return createRowData([campaign, adGroup, "", "", "" , "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "0.5", flexibleReach])
+  return createRowData([campaign, adGroup, "", "", "" , "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "0.5", flexibleReach])
 }
 
 function indexIncluded (indexes, index) {
@@ -598,9 +610,9 @@ function handleFieldLengthLimits(rowData) {
     markCellRed(rowData.values[10])
   }
 
-  const path1 = rowData.values[13].userEnteredValue.stringValue;
+  const path1 = rowData.values[14].userEnteredValue.stringValue;
   if(path1.length > 15) {
-    markCellRed(rowData.values[13])
+    markCellRed(rowData.values[14])
   }
   
 }

@@ -3,42 +3,72 @@
     
   </head>
   <body>
-    <h1>Aditiser Buildout Tool Suite Hub</h1>
+    <div class="container">
+      <header class="navbar">
+        <div class="container">
+          <a class="navbar-brand" href="#">
+            <img src="logo.png" alt="">
+          </a>
+        </div>
+      </header>
+      <h1></h1>
 
-    <h4>Aditiser Account Login</h4>
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" style="display: none;">Authorize</button>
-    <button id="signout_button" style="display: none;">Sign Out</button>
+      <h4>Aditiser Account Login</h4>
+      <!--Add buttons to initiate auth sequence and sign out-->
+      <button type="button" class="btn btn-primary"  id="authorize_button" style="display: none;">Authorize</button>
+      <button type="button" class="btn btn-primary" id="signout_button" style="display: none;">Sign Out</button><br>
 
-    <pre id="content" style="white-space: pre-wrap;"></pre>
+      <h3>Brand Buildout Quickstart Template Tool</h3>
+      <div class="input-group">
+        <span class="input-group-text" id="campaign-addon" for="campaign_name">Campaign:</span>
+        <input type="text" class="form-control" id="campaign_name" name="campaign_name" aria-describedby="campaign-addon">
+      </div><br>
+      <div class="input-group">
+        <span class="input-group-text" id="adgroup-addon">Ad Group:</span>
+        <input type="text" class="form-control" id="ad_group_name" name="ad_group_name" aria-describedby="adgroup-addon"><br>
+      </div><br>
+      <div class="input-group">
+        <span class="input-group-text" id="keyword-addon">Base Keyword:</span>
+        <input type="text" class="form-control" id="base_keyword_name" name="base_keyword_name" aria-describedby="keyword-addon"><br>
+      </div><br>
+      <div class="input-group">
+        <span class="input-group-text" id="finalurl-addon">Final URL:</span>
+        <input type="text" class="form-control" id="final_url_name" name="final_url_name" aria-describedby="finalurl-addon"><br>
+      </div><br>
+      <button type="button" class="btn btn-primary" id="create_brand_buildout_template_button">Create</button><br><br>
 
-    <h3>Brand Buildout Quickstart Template Tool</h3>
-    <form id="brand_buildout_template_data">
-      <label for="campaign_name">Campaign:</label>
-      <input type="text" id="campaign_name" name="campaign_name">
-      <label for="ad_group_name">Ad Group:</label>
-      <input type="text" id="ad_group_name" name="ad_group_name">
-      <label for="base_keyword_name">Base Keyword:</label>
-      <input type="text" id="base_keyword_name" name="base_keyword_name">
-      <label for="final_url_name">Final URL:</label>
-      <input type="text" id="final_url_name" name="final_url_name">
-    </form>
-    <button id="create_brand_buildout_template_button">Create</button>
+      <h3>Brand Buildout Account Autogenerator</h3>
+      <div class="input-group">
+        <span class="input-group-text" id="keyword-spreadsheet-addon">Keyword Spreadsheet URL:</span>
+        <input class="form-control" type="text" id="master_brand_buildout_spreadsheet" name="master_brand_buildout_spreadsheet" value="https://docs.google.com/spreadsheets/d/1JWkGF7YqdvE4KhlV4unr0OwsUuK3Qf955vAqJ0O4cak/edit#gid=395315869">
+      </div><br>
+      <div class="input-group">
+        <span class="input-group-text" id="account-data-spreadsheet-addon">Account Data Spreadsheet URL:</span>
+        <input class="form-control" type="text" id="account_data_spreadsheet" name="account_data_spreadsheet" value="https://docs.google.com/spreadsheets/d/1dCx3OIkVv6Mdt9xEuOnJwr26UHy9lFqzZgkgq4PA3mM/edit#gid=1300538137">
+      </div><br>
+        <button type="button" class="btn btn-primary" id="create_account_buildout_button">
+          <span id="buildout_button_default">
+            Create
+          </span>
+          <span id="buildout_button_loading" hidden>
+            <span class="spinner-grow spinner-grow-sm" id="create_account_buildout_loader"></span>
+            Working...
+          </span>
+          
+        </button>
+      <br><br>
 
-    <h3>Brand Buildout Account Autogenerator</h3>
-    <form id="account_buildout_data">
-      <label for="master_brand_buildout_spreadsheet">Master Brand Buildout Spreadsheet URL:</label>
-      <input type="text" id="master_brand_buildout_spreadsheet" name="master_brand_buildout_spreadsheet" value="https://docs.google.com/spreadsheets/d/1JWkGF7YqdvE4KhlV4unr0OwsUuK3Qf955vAqJ0O4cak/edit#gid=395315869">
-      <label for="account_data_spreadsheet">Account Data Spreadsheet URL:</label>
-      <input type="text" id="account_data_spreadsheet" name="account_data_spreadsheet" value="https://docs.google.com/spreadsheets/d/1dCx3OIkVv6Mdt9xEuOnJwr26UHy9lFqzZgkgq4PA3mM/edit#gid=1300538137">
-    </form>
-    <button id="create_account_buildout_button">Create</button>
-    <div class="loader" id="create_account_buildout_loader" hidden></div>
+      <h4>Patch Notes</h4>
+      <p id="patch_notes">
 
-
+      </p>
+      <footer class="navbar">Version: v0.1.3</footer>
+    </div>
     <!--Stylesheet-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">
     <!--Scripts-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
     <script src="constants.js"></script>
     <script src="spreadsheets.js"></script>
     <script src="index.js"></script>
