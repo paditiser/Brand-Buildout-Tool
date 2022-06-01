@@ -4,11 +4,12 @@
 const authorizeButton = document.getElementById('authorize_button');
 const signoutButton = document.getElementById('signout_button');
 const createBrandBuildoutTemplateButton = document.getElementById('create_brand_buildout_template_button');
-const createAccountBuildoutButton = document.getElementById('create_account_buildout_button');
+const accountBuildoutButton = document.getElementById('create_account_buildout_button');
 
+let BUTTON_STATE = "GET_DATA";
+updateButtonState(BUTTON_STATE);
 
-      
-
+let ACCOUNTS = [];
 
 function readTextFile(file)
 {
@@ -55,7 +56,7 @@ function initClient() {
     authorizeButton.onclick = handleAuthClick;
     signoutButton.onclick = handleSignoutClick;
     createBrandBuildoutTemplateButton.onclick = handleCreateBrandTemplateBuildoutClick;
-    createAccountBuildoutButton.onclick = handleCreateAccountBuildoutClick;
+    accountBuildoutButton.onclick = handleAccountBuildoutClick;
 
     // Initiate patch notes
     const patchNotes = readTextFile("patchnotes.txt")
@@ -113,15 +114,99 @@ function handleCreateBrandTemplateBuildoutClick(e) {
   window.open(url, '_blank');
 }
 
+function updateButtonState(state) {
+  let button_html = ""
+  document.getElementById("buildout_button").innerHTML = button_html;
+
+  switch(state) {
+    case "GET_DATA":
+      button_html = `Get Account Data`
+      break;
+    case "SELECT_DATA":
+      button_html = `Please Select At Least One Account`
+      break;
+    case "CREATE":
+      button_html = `Create`
+      break;
+    default:
+      button_html = `
+      <span class="spinner-grow spinner-grow-sm" id="create_account_buildout_loader"></span>
+          Working...
+      `
+  }
+
+  document.getElementById("buildout_button").innerHTML = button_html;
+}
+
 /**
  * 
  * Create Account buildouts on Click 
  */
-async function handleCreateAccountBuildoutClick(e) {
-  document.getElementById("buildout_button_default").hidden = true;
-  document.getElementById("buildout_button_loading").hidden = false;
+async function handleAccountBuildoutClick(e) {
+  switch(BUTTON_STATE) {
+    case "GET_DATA":
+      updateButtonState("");
 
-  const formData = readAccountBuildoutData();
+      const formData = readAccountBuildoutData();
+      console.log(formData)
+      const accountDataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
+      
+      const [adCopySheetIndex, URLDataSheetIndex] = getSheetIndexesFromAccountDataSpreadsheet(accountDataSpreadsheet);
+      const adCopySheet = accountDataSpreadsheet.sheets[adCopySheetIndex];
+      const urlDataSheet = accountDataSpreadsheet.sheets[URLDataSheetIndex];
+      
+      ACCOUNTS = getAccountsURLDataFromSheet(urlDataSheet);
+      const accounts = ACCOUNTS;
+      console.log(accounts);
+
+      let html = "";
+      for (let i = 0; i < accounts.length; i++) {
+        const account = accounts[i].accountTitle;
+        const id = account + "-checkbox";
+        const template = `
+        <div class="input-group mb-1">
+          <div class="input-group-text">
+            <input id=${id} class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
+          </div>
+          <span class="input-group-text">${account}</span>
+        </div>`;
+        html += template
+      }
+      document.getElementById("accounts_form").innerHTML = html;
+      BUTTON_STATE = "CREATE";
+      updateButtonState(BUTTON_STATE)
+      break;
+    
+    case "CREATE":
+      updateButtonState("")
+      console.log("create state");
+      const selectedAccounts = readAccountCheckBoxData(ACCOUNTS);
+      
+      if(selectedAccounts.length === 0) {
+        alert("Please select at least one account.")
+        updateButtonState(BUTTON_STATE);
+        break;
+      }
+      
+      const formDataCreate = readAccountBuildoutData();
+      const brandBuildoutSpreadsheet = await getSpreadsheet(formDataCreate.brandBuildoutSpreadsheetURL)
+      const accountDataSpreadsheetCreate = await getSpreadsheet(formDataCreate.accountDataSpreadsheetURL)
+      
+      await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheetCreate, selectedAccounts);
+
+      BUTTON_STATE = "GET_DATA";
+      updateButtonState(BUTTON_STATE);
+      document.getElementById("accounts_form").innerHTML = "";
+      ACCOUNTS = [];
+    break;
+
+    default:
+      console.log("")
+  }
+
+  
+
+  /*const formData = readAccountBuildoutData();
   
   if(formData.accountDataSpreadsheetURL === "" || formData.brandBuildoutSpreadsheetURL === ""){
     location.reload()
@@ -132,9 +217,22 @@ async function handleCreateAccountBuildoutClick(e) {
   console.log("first", brandBuildoutSpreadsheet)
   const accountDataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
   
-  await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheet);
-  document.getElementById("buildout_button_loading").hidden = true;
-  document.getElementById("buildout_button_default").hidden = false;
+  await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheet);*/
+}
+
+function readAccountCheckBoxData() {
+  let accounts = [];
+
+  for(let i = 0; i < ACCOUNTS.length; i++) {
+    const boxdiv = document.getElementById(ACCOUNTS[i].accountTitle +"-checkbox");
+    const checked = boxdiv.checked;
+
+    if(checked) {
+      accounts.push(ACCOUNTS[i]);
+    }
+  }
+
+  return accounts;
 }
 
 function readBrandBuildoutTemplateData() {

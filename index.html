@@ -44,18 +44,20 @@
       </div><br>
       <div class="input-group">
         <span class="input-group-text" id="account-data-spreadsheet-addon">Account Data Spreadsheet URL:</span>
-        <input class="form-control" type="text" id="account_data_spreadsheet" name="account_data_spreadsheet" value="https://docs.google.com/spreadsheets/d/1dCx3OIkVv6Mdt9xEuOnJwr26UHy9lFqzZgkgq4PA3mM/edit#gid=1300538137">
+        <input class="form-control" type="text" id="account_data_spreadsheet" name="account_data_spreadsheet" value="https://docs.google.com/spreadsheets/d/1luGgcDjQFYG-9ke_WLQRsHezIiCZf4jFlVSEwsqiuKk/edit#gid=0">
       </div><br>
-        <button type="button" class="btn btn-primary" id="create_account_buildout_button">
-          <span id="buildout_button_default">
-            Create
-          </span>
-          <span id="buildout_button_loading" hidden>
-            <span class="spinner-grow spinner-grow-sm" id="create_account_buildout_loader"></span>
-            Working...
-          </span>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="flexSwitchCheckCheckedDisabled" checked disabled>
+        <label class="form-check-label" for="flexSwitchCheckCheckedDisabled">Manager Style / Account Style</label>
+      </div><br>
+
+      <div id="accounts_form"></div>
+      
+      <button type="button" class="btn btn-primary mt-3" id="create_account_buildout_button">
+        <span id="buildout_button">
           
-        </button>
+        </span>
+      </button>
       <br><br>
 
       <h4>Patch Notes</h4>

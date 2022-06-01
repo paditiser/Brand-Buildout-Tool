@@ -136,7 +136,7 @@ function getSheetIndexesFromAccountDataSpreadsheet(spreadsheet) {
   return [adCopySheetIndex, URLDataSheetIndex];
 }
 
-async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet) {
+async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet, accounts) {
   if(accountDataSpreadsheet.sheets.length > 2) {
     location.reload();
     alert("Account Data Spreadsheet may only have two sheets, named Ad Copy and URL Data")
@@ -146,7 +146,6 @@ async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet) {
   const adCopySheet = accountDataSpreadsheet.sheets[adCopySheetIndex];
   const urlDataSheet = accountDataSpreadsheet.sheets[URLDataSheetIndex];
 
-  const accounts = getAccountsURLDataFromSheet(urlDataSheet);
   let spreadsheets = [];
   for(let i = 0; i < accounts.length; i++) {
     console.log(accounts[i].accountTitle)
