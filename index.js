@@ -188,7 +188,6 @@ async function handleAccountBuildoutClick(e) {
       }
       
       const accounts = ACCOUNTS;
-      console.log(accounts);
 
       const accountHtml = createAccountHtml(accounts)
       document.getElementById("accounts_form").innerHTML = accountHtml;
@@ -198,7 +197,6 @@ async function handleAccountBuildoutClick(e) {
     
     case "CREATE":
       updateButtonState("")
-      console.log("create state");
       const selectedAccounts = readAccountCheckBoxData();
       
       if(selectedAccounts.length === 0) {

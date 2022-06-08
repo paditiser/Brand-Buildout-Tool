@@ -1,6 +1,13 @@
+June 2021 Patch Notes
+
+Version 0.2.0 (Latest) (6/8/22)
+-Adds support for two new spreadsheet styles, Account style and Manager style
+    - /!\ WARNING /!\ To make your old datasheets compatible with this version, please rename "Ad Copy" to 
+    whatever the name of your account is. For example "Russia".
+
 May 2021 Patch Notes
 
-Version 0.1.3 (Latest) (5/31/22) 
+Version 0.1.3 (5/31/22) 
 -Adds support for accounts like Japan that need Headline 1 Position, and Description 4
     -/!\ WARNING /!\ You must add Headline 1 Position and Description 4 to all of your account datasheets,
     even if they are not neccessary for that account. Otherwise the software will not work. Please reference the 
