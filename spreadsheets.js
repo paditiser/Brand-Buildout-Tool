@@ -171,6 +171,8 @@ async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet, accou
     const url = newSpreadsheet.spreadsheetUrl;
     window.open(url, '_blank');
   }
+
+  location.reload()
 }
 
 function getUrlDataSheet(accountDataSpreadsheet) {
