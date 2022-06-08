@@ -8,27 +8,11 @@ const accountBuildoutButton = document.getElementById('create_account_buildout_b
 const spreadsheetStyleSwitch = document.getElementById('spreadsheet-style-switch');
 
 let BUTTON_STATE = "GET_MANAGER_DATA";
+let MANAGER = "";
 updateButtonState(BUTTON_STATE);
 
 let ACCOUNTS = [];
 
-function readTextFile(file)
-{
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status == 0)
-            {
-                var allText = rawFile.responseText;
-            }
-        }
-    }
-    rawFile.send(null);
-    return rawFile.responseText;
-}
 /**
  *  On load, called to load the auth2 library and API client library.
  */
@@ -77,7 +61,6 @@ function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
     authorizeButton.style.display = 'none';
     signoutButton.style.display = 'block';
-
   } else {
     authorizeButton.style.display = 'block';
     signoutButton.style.display = 'none';
@@ -167,25 +150,6 @@ function readManagerSelectData() {
   return manager;
 }
 
-function getAccountsFromManagerSheet(sheet) {
-  let accounts = [];
-
-  //skip header
-  for(let i = 1; i < sheet.data[0].rowData.length; i++) {
-    const row = sheet.data[0].rowData[i];
-    if(rowIsEmpty(row)) continue;
-    const accountTitle = row.values[1].userEnteredValue.stringValue;
-
-    console.log(accountTitle)
-    // sorry
-    if(!accounts.includes(accountTitle)) {
-      accounts.push(accountTitle);
-    }
-  }
-
-  return accounts;
-}
-
 /**
  * 
  * Create Account buildouts on Click 
@@ -197,19 +161,11 @@ async function handleAccountBuildoutClick(e) {
 
       const managerFormData = readAccountBuildoutData();
       const managerDataSpreadsheet = await getSpreadsheet(managerFormData.accountDataSpreadsheetURL)
-      const managers = managerDataSpreadsheet.sheets;
+      const managers = getManagersFromDataSpreadsheet(managerDataSpreadsheet);
       
-      let managerHtml = `<select class="form-select" id="manager-select">`;
-      for (let i = 0; i < managers.length; i++) {
-        const title = managers[i].properties.title;
-        console.log(title)
-        if(title !== "URL Data") {
-          const template = `<option value="${title}">${title}</option>`;
-          managerHtml += template;
-        }
-      }
-      managerHtml += `</select>`;
+      const managerHtml = createManagerHtml(managers)
       document.getElementById("accounts_form").innerHTML = managerHtml;
+     
       BUTTON_STATE = "GET_DATA";
       updateButtonState(BUTTON_STATE)
 
@@ -218,42 +174,24 @@ async function handleAccountBuildoutClick(e) {
       updateButtonState("");
       const spreadsheetStyle = spreadsheetStyleSwitch.checked;
       const formData = readAccountBuildoutData();
-      const accountDataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
+      const dataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
       
-      if(spreadsheetStyle) {
-        const [adCopySheetIndex, URLDataSheetIndex] = getSheetIndexesFromAccountDataSpreadsheet(accountDataSpreadsheet);
-        const urlDataSheet = accountDataSpreadsheet.sheets[URLDataSheetIndex];
-        ACCOUNTS = getAccountsURLDataFromSheet(urlDataSheet);
-      } else {
-        let managerSheet;
+      if(spreadsheetStyle) { // account style
+        const urlDataSheet = getUrlDataSheet(dataSpreadsheet)
+        ACCOUNTS = getAccountsFromAccountSheet(urlDataSheet);
+      } else { // manager style
         const manager = readManagerSelectData();
-        for(let i = 0; i < accountDataSpreadsheet.sheets.length; i++) {
-          console.log("here")
-          if(accountDataSpreadsheet.sheets[i].properties.title === manager) {
-            managerSheet = accountDataSpreadsheet.sheets[i];
-            break;
-          }
-        }
+        MANAGER = manager;
+        
+        const managerSheet = getManagerSheet(dataSpreadsheet, manager)
         ACCOUNTS = getAccountsFromManagerSheet(managerSheet)
       }
       
       const accounts = ACCOUNTS;
       console.log(accounts);
 
-      let html = "";
-      for (let i = 0; i < accounts.length; i++) {
-        const account = accounts[i].accountTitle || accounts[i];
-        const id = account + "-checkbox";
-        const template = `
-        <div class="input-group mb-1">
-          <div class="input-group-text">
-            <input id=${id} class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
-          </div>
-          <span class="input-group-text">${account}</span>
-        </div>`;
-        html += template
-      }
-      document.getElementById("accounts_form").innerHTML = html;
+      const accountHtml = createAccountHtml(accounts)
+      document.getElementById("accounts_form").innerHTML = accountHtml;
       BUTTON_STATE = "CREATE";
       updateButtonState(BUTTON_STATE)
       break;
@@ -261,7 +199,7 @@ async function handleAccountBuildoutClick(e) {
     case "CREATE":
       updateButtonState("")
       console.log("create state");
-      const selectedAccounts = readAccountCheckBoxData(ACCOUNTS);
+      const selectedAccounts = readAccountCheckBoxData();
       
       if(selectedAccounts.length === 0) {
         alert("Please select at least one account.")
@@ -335,4 +273,22 @@ function readAccountBuildoutData() {
   formData.accountDataSpreadsheetURL = document.getElementById("account_data_spreadsheet").value;
   
   return formData;
+}
+
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+            }
+        }
+    }
+    rawFile.send(null);
+    return rawFile.responseText;
 }

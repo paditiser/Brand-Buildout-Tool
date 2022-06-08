@@ -45,6 +45,24 @@ function removeExtraCols(spreadsheetId, rowData, sheetId) {
   }
 }
 
+function getAccountsFromManagerSheet(sheet) {
+  let accounts = [];
+
+  //skip header
+  for(let i = 1; i < sheet.data[0].rowData.length; i++) {
+    const row = sheet.data[0].rowData[i];
+    if(rowIsEmpty(row)) continue;
+    const accountTitle = row.values[1].userEnteredValue.stringValue;
+
+    // sorry
+    if(!accounts.includes(accountTitle)) {
+      accounts.push(accountTitle);
+    }
+  }
+
+  return accounts;
+}
+
 function insertAds(spreadsheetId, sheetId, rowData) {
   /**
    * 
@@ -103,37 +121,53 @@ function rowIsEmpty(row) {
 function getAdCopyRowData(sheet, account, language, type) {
   let adCopyRows = [];
   const rows = sheet.data[0].rowData;
-
   for(let i = 0; i < rows.length; i++) {
-    if(rows[i].values[1].hasOwnProperty('userEnteredValue')) {
+    if(!rowIsEmpty(rows[i]) && rows[i].values[1].hasOwnProperty('userEnteredValue')) {
       const adAccount = rows[i].values[1].userEnteredValue.stringValue;
       const adLanguage = rows[i].values[2].userEnteredValue.stringValue;
       const adType = rows[i].values[3].userEnteredValue.stringValue;
+      console.log(adAccount, adLanguage, adType)
       if(adAccount === account && adLanguage === language && adType === type)  {
         adCopyRows.push(rows[i])
       }
     } 
   }
+  console.log(adCopyRows)
 
   return adCopyRows;
 }
 
 async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet, accounts) {
   const urlDataSheet = getUrlDataSheet(accountDataSpreadsheet);
-
+  console.log("URLDATA", urlDataSheet)
   let spreadsheets = [];
+  // ACCOUNT STYLE
+  if(MANAGER === "") {
+    console.log("account")
+    for(let i = 0; i < accounts.length; i++) {
+      const adCopySheet = getAccountAdCopySheet(accountDataSpreadsheet, accounts[i]);
+      console.log("COPY SHEET", adCopySheet)
+      if(adCopySheet === null) continue;
+      
+      const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, accounts[i]);
+      spreadsheets.push(accountBuildoutSpreadsheet);
+    }
+  } else { // MANAGER STYLE
 
-  for(let i = 0; i < accounts.length; i++) {
-    console.log(accounts[i])
-    const adCopySheet = getAccountAdCopySheet(accountDataSpreadsheet, accounts[i]);
-    console.log(adCopySheet)
-    const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, accounts[i]);
-    spreadsheets.push(accountBuildoutSpreadsheet);
+    const managerSheet = getManagerSheet(accountDataSpreadsheet, MANAGER);
+
+    for(let i = 0; i < accounts.length; i++) {
+      const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, managerSheet, urlDataSheet, accounts[i]);
+
+      spreadsheets.push(accountBuildoutSpreadsheet);
+    }
+        
+    
   }
-  
+  console.log(spreadsheets)
   for(let i = 0; i < spreadsheets.length; i++) {
     const newSpreadsheet = await createNewDocument(spreadsheets[i]);
-
+    console.log(newSpreadsheet)
     const url = newSpreadsheet.spreadsheetUrl;
     window.open(url, '_blank');
   }
@@ -143,21 +177,20 @@ function getUrlDataSheet(accountDataSpreadsheet) {
   for(let i = 0; i < accountDataSpreadsheet.sheets.length; i++) {
     const sheet = accountDataSpreadsheet.sheets[i];
 
-    if(sheet.properties.title === "Ad Copy") {
+    if(sheet.properties.title === "URL Data") {
       return sheet;
     }
   }
   
   return null;
 }
+
 
 function getAccountAdCopySheet(accountDataSpreadsheet, account) {
   for(let i = 0; i < accountDataSpreadsheet.sheets.length; i++) {
     const sheet = accountDataSpreadsheet.sheets[i];
-    console.log(sheet)
-
-    if(sheet.properties.title === account) {
-      console.log("here")
+    console.log("sheet", sheet.properties.title, account)
+    if(sheet.properties.title === account || sheet.properties.title === account.accountTitle) {
       return sheet;
     }
   }
@@ -165,27 +198,20 @@ function getAccountAdCopySheet(accountDataSpreadsheet, account) {
   return null;
 }
 
-function getAccountsURLDataFromSheet(sheet) {
+function getAccountsFromAccountSheet(sheet) {
   let accounts = [];
-
+  console.log("inside")
   //skip header
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
     if(rowIsEmpty(row)) continue;
-    const accountTitle = row.values[0].userEnteredValue.stringValue;
-    const thirdLevelDomain = row.values[3].userEnteredValue.stringValue;
 
-    const accountData = { accountTitle, thirdLevelDomain }
+    const accountTitle = row.values[0].userEnteredValue.stringValue;
     console.log(accountTitle)
-    // sorry
-    let included = false;
-    for (let i = 0; i < accounts.length; i++) {
-      if(accounts[i].accountTitle === accountData.accountTitle){
-        included = true;
-      }
-    }
-    if(!included) {
-      accounts.push(accountData);
+    
+    if(accountTitle !== "URL DATA"){
+      console.log("hjere")
+      accounts.push(accountTitle);
     }
   }
 
@@ -203,7 +229,7 @@ function getAccountCampaignsFromSheet(sheet, account) {
     }
     const campaign = row.values[3].userEnteredValue.stringValue;
     const rowAccount = row.values[1].userEnteredValue.stringValue;
-    if(rowAccount === account.accountTitle && !campaigns.includes(campaign)) {
+    if(rowAccount === account && !campaigns.includes(campaign)) {
       campaigns.push(campaign);
     }
   }
@@ -213,7 +239,6 @@ function getAccountCampaignsFromSheet(sheet, account) {
 
 function getAccountLanguagesFromSheet(sheet, account) { 
   let languages = [];
-
   //skip header
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
@@ -223,7 +248,7 @@ function getAccountLanguagesFromSheet(sheet, account) {
     const language = row.values[2].userEnteredValue.stringValue;
     const rowAccount = row.values[1].userEnteredValue.stringValue;
 
-    if(rowAccount === account.accountTitle && !languages.includes(language)) {
+    if(rowAccount === account && !languages.includes(language)) {
       languages.push(language);
     }
   }
@@ -242,8 +267,26 @@ function getPostfixFromSheet(sheet, account, language) {
     const rowAccount = row.values[0].userEnteredValue.stringValue;
     const postfix = row.values[2].userEnteredValue.stringValue;
 
-    if(rowAccount === account.accountTitle && rowLanguage === language) {
+    if(rowAccount === account && rowLanguage === language) {
       return postfix;
+    }
+  }
+
+  return "ERROR";
+}
+
+function getThirdLevelDomainFromSheet(sheet, account) {
+  //skip header
+  for(let i = 1; i < sheet.data[0].rowData.length; i++) {
+    const row = sheet.data[0].rowData[i];
+    if(rowIsEmpty(row)){
+      continue;
+    } 
+    const rowAccount = row.values[0].userEnteredValue.stringValue;
+    const thirdLevelDomain = row.values[3].userEnteredValue.stringValue;
+
+    if(rowAccount === account ) {
+      return thirdLevelDomain;
     }
   }
 
@@ -253,9 +296,11 @@ function getPostfixFromSheet(sheet, account, language) {
 async function createAccountBuildoutSpreadsheet(keywordSpreadsheet, adCopySheet, urlDataSheet, account) {
   const rawHeaderRow = ["Campaign", "Ad Group", "Keyword", "Criterion Type", "Final URL", "Labels", "Ad type", "Status", "Description Line 1", "Description Line 2", "Headline 1", "Headline 1 position", "Headline 2", "Headline 3", "Path 1", "Headline 4", "Headline 5", "Headline 6", "Headline 7", "Description 1", "Description 1 position", "Description 2", "Description 3", "Description 4", "Max CPC", "Flexible Reach"];
   //adds header row 
-  let masterSpreadsheet = createSpreadSheet(account.accountTitle + " Buildout", rawHeaderRow);
+  let masterSpreadsheet = createSpreadSheet(account+ " Buildout", rawHeaderRow);
   const languages = getAccountLanguagesFromSheet(adCopySheet, account);
+  console.log(languages)
   const campaigns = getAccountCampaignsFromSheet(adCopySheet, account);
+  console.log(campaigns)
   //for every brand
   for (let i = 0; i < keywordSpreadsheet.sheets.length; i++) {
     for (let j = 0; j < languages.length; j++) {
@@ -265,7 +310,6 @@ async function createAccountBuildoutSpreadsheet(keywordSpreadsheet, adCopySheet,
         //console.log(account.accountTitle, "Brand: " + i , languages[j], campaigns[k])
         const sheet = keywordSpreadsheet.sheets[i];
         const rawRowData = sheet.data[0].rowData;
-        console.log(sheet)
         const rowData = rawRowData.slice(1); //removes header from each brand buildout
         
         //create new copy that we can edit
@@ -277,16 +321,18 @@ async function createAccountBuildoutSpreadsheet(keywordSpreadsheet, adCopySheet,
           let newRowData = copyRowData(rowData[i])
           const rawCampaignTitle = newRowData.values[0].userEnteredValue.stringValue;
           
-          const accountCampaignTitle = (rawCampaignTitle + " > " + account.accountTitle + " > " + campaign + " (" + language + ")");
+          const accountCampaignTitle = (rawCampaignTitle + " > " + account + " > " + campaign + " (" + language + ")");
           newRowData.values[0].userEnteredValue.stringValue = accountCampaignTitle;
           keywordRowData.push(newRowData);
         }
 
+        const thirdLevelDomain = getThirdLevelDomainFromSheet(urlDataSheet, account)
         for(let i = 0; i < keywordRowData.length; i++) {
           //Final Url
           if (keywordRowData[i].values.length > 4 && keywordRowData[i].values[4].hasOwnProperty('userEnteredValue')) {
             const rawFinalURL = keywordRowData[i].values[4].userEnteredValue.stringValue;
-            const accountFinalURL = rawFinalURL.replace("www.", account.thirdLevelDomain + ".");
+
+            const accountFinalURL = rawFinalURL.replace("www.", thirdLevelDomain + ".");
             keywordRowData[i].values[4].userEnteredValue.stringValue = accountFinalURL;
           }
         }
@@ -301,7 +347,8 @@ async function createAccountBuildoutSpreadsheet(keywordSpreadsheet, adCopySheet,
 
         //Ads
         //TODO
-        const adCopyRowData = getAdCopyRowData(adCopySheet, account.accountTitle, language, campaign);
+        const adCopyRowData = getAdCopyRowData(adCopySheet, account, language, campaign);
+        console.log(adCopyRowData)
         const brandTitle = sheet.properties.title;
         const path = createPath(brandTitle);
         for(let i = 0; i < adCopyRowData.length; i++) {
@@ -728,3 +775,58 @@ function consoleLogSpreadSheet(spreadSheet) {
     console.log(rowText)
   }
 }
+
+function getManagersFromDataSpreadsheet(dataSpreadsheet) {
+  let managers = [];
+  for(let i = 0; i < dataSpreadsheet.sheets.length; i++) {
+    const sheet = dataSpreadsheet.sheets[i];
+    if(sheet.properties.title !== "URL Data") managers.push(sheet.properties.title);
+  }
+
+  return managers;
+}
+
+function getManagerSheet(dataSpreadsheet, manager) {
+  let managerSheet;
+  for(let i = 0; i < dataSpreadsheet.sheets.length; i++) {
+
+    if(dataSpreadsheet.sheets[i].properties.title === manager) {
+      managerSheet = dataSpreadsheet.sheets[i];
+      break;
+    }
+  }
+
+  return managerSheet
+}
+
+function createManagerHtml(managers) {
+  let managerHtml = `<select class="form-select" id="manager-select">`;
+  for (let i = 0; i < managers.length; i++) {        
+    const template = `<option value="${managers[i]}">${managers[i]}</option>`;
+    managerHtml += template;
+  
+  }
+  managerHtml += `</select>`;
+
+  return managerHtml
+}
+
+function createAccountHtml(accounts) {
+  let html = "";
+
+  for (let i = 0; i < accounts.length; i++) {
+    const account = accounts[i].accountTitle || accounts[i];
+    const id = account + "-checkbox";
+    const template = `
+    <div class="input-group mb-1">
+      <div class="input-group-text">
+        <input id=${id} class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
+      </div>
+      <span class="input-group-text">${account}</span>
+    </div>`;
+    html += template
+  }
+
+  return html;
+}
+
