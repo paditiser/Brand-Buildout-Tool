@@ -242,7 +242,7 @@ function readAccountCheckBoxData() {
 
   for(let i = 0; i < ACCOUNTS.length; i++) {
     const title = ACCOUNTS[i].accountTitle || ACCOUNTS[i]
-    const boxdiv = document.getElementById(title+"-checkbox");
+    const boxdiv = document.getElementById(title.split(" ").join("")+"-checkbox");
     const checked = boxdiv.checked;
 
     if(checked) {

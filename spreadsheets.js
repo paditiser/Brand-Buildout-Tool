@@ -818,7 +818,8 @@ function createAccountHtml(accounts) {
 
   for (let i = 0; i < accounts.length; i++) {
     const account = accounts[i].accountTitle || accounts[i];
-    const id = account + "-checkbox";
+    const id = account.split(" ").join("") + "-checkbox";
+
     const template = `
     <div class="input-group mb-1">
       <div class="input-group-text">
