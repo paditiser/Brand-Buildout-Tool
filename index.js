@@ -207,7 +207,7 @@ async function handleAccountBuildoutClick(e) {
       
       const formDataCreate = readAccountBuildoutData();
       const brandBuildoutSpreadsheet = await getSpreadsheet(formDataCreate.brandBuildoutSpreadsheetURL)
-      const accountDataSpreadsheetCreate = await getSpreadsheet(formDataCreate.accountDataSpreadsheetURL)
+      const accountDataSpreadsheetCreate = await getSpreadsheetSingleManager(formDataCreate.accountDataSpreadsheetURL, MANAGER)
       
       await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheetCreate, selectedAccounts);
 
@@ -242,7 +242,7 @@ function readAccountCheckBoxData() {
 
   for(let i = 0; i < ACCOUNTS.length; i++) {
     const title = ACCOUNTS[i].accountTitle || ACCOUNTS[i]
-    const boxdiv = document.getElementById(title.split(" ").join("")+"-checkbox");
+    const boxdiv = document.getElementById(title.split (" ").join("")+"-checkbox");
     const checked = boxdiv.checked;
 
     if(checked) {

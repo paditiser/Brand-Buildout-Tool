@@ -551,6 +551,7 @@ async function getSpreadsheet(url) {
   return res;
 }
 
+//modify to include urldata sheet
 async function getSpreadsheetSingleManager(url, manager) {
   const spreadsheetId = getDocumentIdFromUrl(url);
   let res = null;
@@ -558,7 +559,8 @@ async function getSpreadsheetSingleManager(url, manager) {
   await gapi.client.sheets.spreadsheets.get({
     spreadsheetId,
     ranges: [
-      `${manager}!A1:Z150` //150 row limit imposed
+      `${manager}!A1:Z150`, //150 row limit imposed
+      `URL Data!A1:D150`
     ],
     includeGridData: true                                
   }).then((response) => {
