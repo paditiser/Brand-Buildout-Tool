@@ -521,6 +521,21 @@ function getDocumentIdFromUrl (url) {
   return documentId;
 }
 
+async function getSpreadsheetNoGridData(url) {
+  const spreadsheetId = getDocumentIdFromUrl(url);
+  let res = null;
+
+  await gapi.client.sheets.spreadsheets.get({
+    spreadsheetId,
+    ranges: [],
+    includeGridData: false                                
+  }).then((response) => {
+    res = response.result;
+  });
+
+  return res;
+}
+
 async function getSpreadsheet(url) {
   const spreadsheetId = getDocumentIdFromUrl(url);
   let res = null;
@@ -528,6 +543,23 @@ async function getSpreadsheet(url) {
   await gapi.client.sheets.spreadsheets.get({
     spreadsheetId,
     ranges: [],
+    includeGridData: true                                
+  }).then((response) => {
+    res = response.result;
+  });
+
+  return res;
+}
+
+async function getSpreadsheetSingleManager(url, manager) {
+  const spreadsheetId = getDocumentIdFromUrl(url);
+  let res = null;
+
+  await gapi.client.sheets.spreadsheets.get({
+    spreadsheetId,
+    ranges: [
+      `${manager}!A1:Z150` //150 row limit imposed
+    ],
     includeGridData: true                                
   }).then((response) => {
     res = response.result;

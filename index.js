@@ -160,7 +160,7 @@ async function handleAccountBuildoutClick(e) {
       updateButtonState("")
 
       const managerFormData = readAccountBuildoutData();
-      const managerDataSpreadsheet = await getSpreadsheet(managerFormData.accountDataSpreadsheetURL)
+      const managerDataSpreadsheet = await getSpreadsheetNoGridData(managerFormData.accountDataSpreadsheetURL)
       const managers = getManagersFromDataSpreadsheet(managerDataSpreadsheet);
       
       const managerHtml = createManagerHtml(managers)
@@ -174,15 +174,15 @@ async function handleAccountBuildoutClick(e) {
       updateButtonState("");
       const spreadsheetStyle = spreadsheetStyleSwitch.checked;
       const formData = readAccountBuildoutData();
-      const dataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
       
       if(spreadsheetStyle) { // account style
+        const dataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
         const urlDataSheet = getUrlDataSheet(dataSpreadsheet)
         ACCOUNTS = getAccountsFromAccountSheet(urlDataSheet);
       } else { // manager style
         const manager = readManagerSelectData();
         MANAGER = manager;
-        
+        const dataSpreadsheet = await getSpreadsheetSingleManager(formData.accountDataSpreadsheetURL, MANAGER)
         const managerSheet = getManagerSheet(dataSpreadsheet, manager)
         ACCOUNTS = getAccountsFromManagerSheet(managerSheet)
       }
