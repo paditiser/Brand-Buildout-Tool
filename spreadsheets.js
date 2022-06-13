@@ -54,7 +54,6 @@ function getAccountsFromManagerSheet(sheet) {
     if(rowIsEmpty(row)) continue;
     const accountTitle = row.values[1].userEnteredValue.stringValue;
 
-    // sorry
     if(!accounts.includes(accountTitle)) {
       accounts.push(accountTitle);
     }
@@ -141,29 +140,16 @@ async function processRequest(buildoutSpreadsheet, accountDataSpreadsheet, accou
   const urlDataSheet = getUrlDataSheet(accountDataSpreadsheet);
   console.log("URLDATA", urlDataSheet)
   let spreadsheets = [];
-  // ACCOUNT STYLE
-  if(MANAGER === "") {
-    console.log("account")
-    for(let i = 0; i < accounts.length; i++) {
-      const adCopySheet = getAccountAdCopySheet(accountDataSpreadsheet, accounts[i]);
-      console.log("COPY SHEET", adCopySheet)
-      if(adCopySheet === null) continue;
-      
-      const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, adCopySheet, urlDataSheet, accounts[i]);
-      spreadsheets.push(accountBuildoutSpreadsheet);
-    }
-  } else { // MANAGER STYLE
 
-    const managerSheet = getManagerSheet(accountDataSpreadsheet, MANAGER);
+  const managerSheet = getManagerSheet(accountDataSpreadsheet, MANAGER);
 
-    for(let i = 0; i < accounts.length; i++) {
-      const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, managerSheet, urlDataSheet, accounts[i]);
+  for(let i = 0; i < accounts.length; i++) {
+    const accountBuildoutSpreadsheet = await createAccountBuildoutSpreadsheet(buildoutSpreadsheet, managerSheet, urlDataSheet, accounts[i]);
 
-      spreadsheets.push(accountBuildoutSpreadsheet);
-    }
-        
-    
+    spreadsheets.push(accountBuildoutSpreadsheet);
   }
+        
+
   console.log(spreadsheets)
   for(let i = 0; i < spreadsheets.length; i++) {
     const newSpreadsheet = await createNewDocument(spreadsheets[i]);
@@ -202,7 +188,6 @@ function getAccountAdCopySheet(accountDataSpreadsheet, account) {
 
 function getAccountsFromAccountSheet(sheet) {
   let accounts = [];
-  console.log("inside")
   //skip header
   for(let i = 1; i < sheet.data[0].rowData.length; i++) {
     const row = sheet.data[0].rowData[i];
@@ -212,7 +197,6 @@ function getAccountsFromAccountSheet(sheet) {
     console.log(accountTitle)
     
     if(accountTitle !== "URL DATA"){
-      console.log("hjere")
       accounts.push(accountTitle);
     }
   }
@@ -300,9 +284,8 @@ async function createAccountBuildoutSpreadsheet(keywordSpreadsheet, adCopySheet,
   //adds header row 
   let masterSpreadsheet = createSpreadSheet(account+ " Buildout", rawHeaderRow);
   const languages = getAccountLanguagesFromSheet(adCopySheet, account);
-  console.log(languages)
   const campaigns = getAccountCampaignsFromSheet(adCopySheet, account);
-  console.log(campaigns)
+
   //for every brand
   for (let i = 0; i < keywordSpreadsheet.sheets.length; i++) {
     for (let j = 0; j < languages.length; j++) {
