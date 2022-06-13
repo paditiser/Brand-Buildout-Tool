@@ -5,7 +5,6 @@ const authorizeButton = document.getElementById('authorize_button');
 const signoutButton = document.getElementById('signout_button');
 const createBrandBuildoutTemplateButton = document.getElementById('create_brand_buildout_template_button');
 const accountBuildoutButton = document.getElementById('create_account_buildout_button');
-const spreadsheetStyleSwitch = document.getElementById('spreadsheet-style-switch');
 
 let BUTTON_STATE = "GET_MANAGER_DATA";
 let MANAGER = "";
@@ -42,7 +41,6 @@ function initClient() {
     signoutButton.onclick = handleSignoutClick;
     createBrandBuildoutTemplateButton.onclick = handleCreateBrandTemplateBuildoutClick;
     accountBuildoutButton.onclick = handleAccountBuildoutClick;
-    spreadsheetStyleSwitch.onclick = handleSpreadsheetStyleClick;
 
     // Initiate patch notes
     const patchNotes = readTextFile("patchnotes.txt")
@@ -71,23 +69,6 @@ function updateSigninStatus(isSignedIn) {
 // Button Handling
 // =======================
 
-/**
- * Switch between Account and Manager style spreadsheet
- * @param {*} event 
- */
-// Account (true) / Manager (false)
-function handleSpreadsheetStyleClick(event) {
-  const selection = spreadsheetStyleSwitch.checked;
-  if(!selection) {
-    document.getElementById("accounts_form").innerHTML = "";
-    BUTTON_STATE = "GET_MANAGER_DATA";
-    updateButtonState(BUTTON_STATE);
-  } else {
-    document.getElementById("accounts_form").innerHTML = "";
-    BUTTON_STATE = "GET_DATA";
-    updateButtonState(BUTTON_STATE);
-  }
-}
 
 /**
  *  Sign in the user upon button click.
@@ -172,20 +153,13 @@ async function handleAccountBuildoutClick(e) {
       break;
     case "GET_DATA":
       updateButtonState("");
-      const spreadsheetStyle = spreadsheetStyleSwitch.checked;
       const formData = readAccountBuildoutData();
-      
-      if(spreadsheetStyle) { // account style
-        const dataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
-        const urlDataSheet = getUrlDataSheet(dataSpreadsheet)
-        ACCOUNTS = getAccountsFromAccountSheet(urlDataSheet);
-      } else { // manager style
-        const manager = readManagerSelectData();
-        MANAGER = manager;
-        const dataSpreadsheet = await getSpreadsheetSingleManager(formData.accountDataSpreadsheetURL, MANAGER)
-        const managerSheet = getManagerSheet(dataSpreadsheet, manager)
-        ACCOUNTS = getAccountsFromManagerSheet(managerSheet)
-      }
+
+      const manager = readManagerSelectData();
+      MANAGER = manager;
+      const dataSpreadsheet = await getSpreadsheetSingleManager(formData.accountDataSpreadsheetURL, MANAGER)
+      const managerSheet = getManagerSheet(dataSpreadsheet, manager)
+      ACCOUNTS = getAccountsFromManagerSheet(managerSheet)
       
       const accounts = ACCOUNTS;
 
@@ -220,21 +194,6 @@ async function handleAccountBuildoutClick(e) {
     default:
       console.log("")
   }
-
-  
-
-  /*const formData = readAccountBuildoutData();
-  
-  if(formData.accountDataSpreadsheetURL === "" || formData.brandBuildoutSpreadsheetURL === ""){
-    location.reload()
-    alert("Please submit both a URL for the master brand buildout spreadsheet and the account data spreadsheet")
-  }
-  
-  const brandBuildoutSpreadsheet = await getSpreadsheet(formData.brandBuildoutSpreadsheetURL)
-  console.log("first", brandBuildoutSpreadsheet)
-  const accountDataSpreadsheet = await getSpreadsheet(formData.accountDataSpreadsheetURL)
-  
-  await processRequest(brandBuildoutSpreadsheet, accountDataSpreadsheet);*/
 }
 
 function readAccountCheckBoxData() {
@@ -270,6 +229,11 @@ function readAccountBuildoutData() {
   formData.brandBuildoutSpreadsheetURL = document.getElementById("master_brand_buildout_spreadsheet").value;
   formData.accountDataSpreadsheetURL = document.getElementById("account_data_spreadsheet").value;
   
+  if(formData.brandBuildoutSpreadsheetURL === "" || formData.accountDataSpreadsheetURL === "") {
+    alert("Please enter both a keyword spreadsheet and a manager-style data spreadsheet.")
+    location.reload()
+  }
+
   return formData;
 }
 
